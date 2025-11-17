@@ -383,152 +383,37 @@ orchestrator.start()
 
 ---
 
-## Results & Metrics
-
-### What Gets Measured
-
-**Security Metrics**:
-- Total attacks tested
-- Detection rate (% blocked)
-- False positive rate
-- Vulnerability count over time
-- Attack success rate by category
-
-**Performance Metrics**:
-- Average response time
-- p50, p95, p99 latency
-- Requests per second (throughput)
-- Error rate
-- Timeout rate
-
-**System Health**:
-- Test execution success rate
-- Coverage: lines of code tested
-- Trend: improving or degrading
-- Time to detect new vulnerabilities
-
----
-
-### Sample Results
-
-**After 1 Week of Continuous Testing**:
+## Self-Improving Loop
 
 ```
-📊 WEEKLY SUMMARY
-
-Security:
-  - Tests Executed: 2,847
-  - Vulnerabilities Found: 3 (down from 12 baseline)
-  - Detection Rate: 98.7%
-  - New Attack Patterns: 47
-
-Performance:
-  - Avg Response Time: 2.3s (stable)
-  - p95 Latency: 4.1s
-  - Requests/sec: 15.2
-  - Error Rate: 0.3%
-
-Improvements:
-  ✅ 75% reduction in vulnerabilities (12 → 3)
-  ✅ 47 new attack patterns discovered and blocked
-  ✅ Performance maintained under security load
-  ⚠️  1 false positive detected (pricing inquiry flagged)
-
-Action Items:
-  1. Review false positive case
-  2. Deploy winning A/B variant (Enhanced)
-  3. Continue monitoring
+your-project/
+├── improvements/           # Generated improvements
+│   ├── plan_*.json        # Improvement plans
+│   ├── IMP-*.json         # Individual improvements
+│   └── history.json       # Improvement history
+│
+├── versions/              # Versioned backups
+│   ├── design_ai_core_v*.py    # Timestamped backups
+│   └── metadata_v*.json        # Version metadata
+│
+├── verification_results/  # Verification reports
+│   ├── verification_*.json
+│   └── verification_*.md
+│
+└── cycle_history.json     # Complete cycle history
 ```
 
----
+- Loads test results from continuous_testing_results/
+- Categorizes vulnerabilities by root cause
+- Groups related vulnerabilities
+- Generates systematic fixes for each category
 
-## Advanced Use Cases
-
-### Integration with CI/CD
-
-```yaml
-# .github/workflows/security-test.yml
-name: LLM Security Test
-
-on:
-  pull_request:
-  schedule:
-    - cron: '0 2 * * *'  # Daily at 2am
-
-jobs:
-  security-test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      
-      - name: Run Security Tests
-        run: |
-          python -m pip install -r requirements.txt
-          python run_full_assessment.py
-      
-      - name: Check for regressions
-        run: |
-          python check_regression.py --threshold 5
-      
-      - name: Upload results
-        uses: actions/upload-artifact@v2
-        with:
-          name: security-results
-          path: continuous_testing_results/
 ```
+# Enable auto-improvement in config
+echo '{"auto_apply_improvements": true}' >> orchestrator_config.json
 
----
-
-### Custom Attack Strategies
-
-```python
-# Add your own custom attacks
-
-class CustomBusinessLogicAttacks(Probe):
-    """Domain-specific attacks for your business"""
-    
-    prompts = [
-        "Exploit specific to your industry",
-        "Your competitor's known attack pattern",
-        "Regulatory compliance test case"
-    ]
-
-# Add to orchestrator
-orchestrator.adversarial_gen.seed_attacks.extend(
-    CustomBusinessLogicAttacks.prompts
-)
-```
-
----
-
-### Real-Time Dashboard
-
-```python
-# dashboard.py - Serves real-time metrics
-
-from flask import Flask, jsonify
-import json
-
-app = Flask(__name__)
-
-@app.route('/api/status')
-def get_status():
-    with open('continuous_testing_results/test_history.json') as f:
-        history = json.load(f)
-    
-    return jsonify({
-        'last_24h_tests': len([t for t in history if recent(t)]),
-        'current_vulnerabilities': get_current_vuln_count(),
-        'system_health': calculate_health()
-    })
-
-@app.route('/api/alerts')
-def get_alerts():
-    with open('continuous_testing_results/alerts.json') as f:
-        return jsonify(json.load(f))
-
-if __name__ == '__main__':
-    app.run(port=5000)
+# Start - system will test and improve itself automatically
+python integrated_orchestrator.py
 ```
 
 ---
